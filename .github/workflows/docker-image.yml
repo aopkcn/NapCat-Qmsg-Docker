@@ -50,6 +50,17 @@ jobs:
         docker push $DOCKER_IMAGE_TAG_AMD64
         docker push $ALICLOUD_IMAGE_TAG_AMD64
 
+        # 构建并推送 arm64 架构的镜像
+        docker buildx build --platform linux/arm64 -t $REPOSITORY_NAME:$IMAGE_TAG-arm64 --push .
+        GHCR_IMAGE_TAG_ARM64="ghcr.io/$GHCR_USERNAME/$REPOSITORY_NAME:$IMAGE_TAG-arm64"
+        DOCKER_IMAGE_TAG_ARM64="docker.io/$DOCKER_USERNAME/$REPOSITORY_NAME:$IMAGE_TAG-arm64"
+        ALICLOUD_IMAGE_TAG_ARM64="$ALICLOUD_REGISTRY/$ALICLOUD_NAMESPACE/$REPOSITORY_NAME:$IMAGE_TAG-arm64"
+        docker tag $REPOSITORY_NAME:$IMAGE_TAG-arm64 $GHCR_IMAGE_TAG_ARM64
+        docker tag $REPOSITORY_NAME:$IMAGE_TAG-arm64 $DOCKER_IMAGE_TAG_ARM64
+        docker tag $REPOSITORY_NAME:$IMAGE_TAG-arm64 $ALICLOUD_IMAGE_TAG_ARM64
+        docker push $GHCR_IMAGE_TAG_ARM64
+        docker push $DOCKER_IMAGE_TAG_ARM64
+        docker push $ALICLOUD_IMAGE_TAG_ARM64
 
     - name: Logout from GitHub Container Registry
       run: docker logout ghcr.io
