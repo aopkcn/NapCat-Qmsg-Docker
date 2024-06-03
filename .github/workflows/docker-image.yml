@@ -14,7 +14,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Build the Docker image
+    - name: ¹¹½¨¾µÏñ
       run: |
         REPOSITORY_NAME="napcat"
         IMAGE_TAG="qmsg"
