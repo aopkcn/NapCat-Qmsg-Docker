@@ -22,7 +22,9 @@
 
 容器通过环境变量来配置，环境变量名称可以查看 [entrypoint](./entrypoint.sh)👈
 
-具体参数可参考[NapCatQQ官方文档](https://napneko.github.io/zh-CN/guide/getting-started)[Qmsg酱官方文档](https://qmsg.zendee.cn/docs/)
+具体参数可参考
+ - [Qmsg酱官方文档](https://qmsg.zendee.cn/docs/)
+ - [NapCatQQ官方文档](https://napneko.github.io/zh-CN/guide/getting-started)
 
 # 启动容器
 ## QMSG
