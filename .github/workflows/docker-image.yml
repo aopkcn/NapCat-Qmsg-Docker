@@ -19,21 +19,22 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
-    - name: Set Environment Variables
-      run: |
-        echo "${{ secrets.ENV }}" > envfile
-      env:
-        ENV: ${{ secrets.ENV }}
-    
-    - name: Source Environment Variables
-      run: |
-        source envfile
-        echo $GHCR_KEY | docker login ghcr.io -u $GHCR_USERNAME --password-stdin
-        echo $DOCKER_PASSWD | docker login docker.io -u $DOCKER_USERNAME --password-stdin
-        echo $ALICLOUD_PASSWORD | docker login $ALICLOUD_REGISTRY -u $ALICLOUD_USERNAME --password-stdin
+    - name: Login to GitHub Container Registry
+      run: echo "${{ secrets.GHCR_KEY }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
+
+    - name: Login to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWD }}" | docker login docker.io -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Login to Alibaba Cloud Registry
+      run: echo "${{ secrets.ALICLOUD_PASSWORD }}" | docker login ${{ secrets.ALICLOUD_REGISTRY }} -u "${{ secrets.ALICLOUD_USERNAME }}" --password-stdin
 
     - name: Build and push Docker images
       run: |
+        GHCR_USERNAME="${{ secrets.GHCR_USERNAME }}"
+        DOCKER_USERNAME="${{ secrets.DOCKER_USERNAME }}"
+        ALICLOUD_USERNAME="${{ secrets.ALICLOUD_USERNAME }}"
+        ALICLOUD_REGISTRY="${{ secrets.ALICLOUD_REGISTRY }}"
+        ALICLOUD_NAMESPACE="${{ secrets.ALICLOUD_NAMESPACE }}"
         REPOSITORY_NAME="napcat"
         IMAGE_TAG="qmsg"
 
@@ -49,6 +50,7 @@ jobs:
         docker push $DOCKER_IMAGE_TAG_AMD64
         docker push $ALICLOUD_IMAGE_TAG_AMD64
 
+
     - name: Logout from GitHub Container Registry
       run: docker logout ghcr.io
 
@@ -56,4 +58,4 @@ jobs:
       run: docker logout docker.io
 
     - name: Logout from Alibaba Cloud Registry
-      run: docker logout $ALICLOUD_REGISTRY
+      run: docker logout ${{ secrets.ALICLOUD_REGISTRY }}
