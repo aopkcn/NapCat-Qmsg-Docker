@@ -5,6 +5,7 @@ on:
     paths:
       - 'Dockerfile'
       - 'entrypoint.sh'
+  workflow_dispatch:
 
 jobs:
   build:
