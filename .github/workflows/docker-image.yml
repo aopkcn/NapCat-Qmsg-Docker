@@ -1,4 +1,4 @@
-name: Docker ¾µÏñ CI
+name: Docker é•œåƒ CI
 
 on:
   push:
@@ -11,30 +11,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: ¼ì³ö´úÂë
+    - name: æ£€å‡ºä»£ç 
       uses: actions/checkout@v4
 
-    - name: ¹¹½¨¾µÏñ
+    - name: æ„å»ºé•œåƒ
       run: |
         REPOSITORY_NAME="napcat"
         IMAGE_TAG="qmsg"
         docker build -t $REPOSITORY_NAME:$IMAGE_TAG .
 
-    - name: ÍÆËÍµ½ GitHub ÈİÆ÷×¢²á±í
+    - name: æ¨é€åˆ° GitHub å®¹å™¨æ³¨å†Œè¡¨
       run: |
         echo "${{ secrets.GHCR_KEY }}" | docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} --password-stdin
         GHCR_IMAGE_TAG="ghcr.io/${{ secrets.GHCR_USERNAME }}/$REPOSITORY_NAME:$IMAGE_TAG"
         docker tag $REPOSITORY_NAME:$IMAGE_TAG $GHCR_IMAGE_TAG
         docker push $GHCR_IMAGE_TAG
 
-    - name: ÍÆËÍµ½ Docker Hub
+    - name: æ¨é€åˆ° Docker Hub
       run: |
         echo "${{ secrets.DOCKER_PASSWD }}" | docker login docker.io -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
         DOCKER_IMAGE_TAG="docker.io/${{ secrets.DOCKER_USERNAME }}/$REPOSITORY_NAME:$IMAGE_TAG"
         docker tag $REPOSITORY_NAME:$IMAGE_TAG $DOCKER_IMAGE_TAG
         docker push $DOCKER_IMAGE_TAG
 
-    - name: ÍÆËÍµ½°¢ÀïÔÆÈİÆ÷¾µÏñ·şÎñ
+    - name: æ¨é€åˆ°é˜¿é‡Œäº‘å®¹å™¨é•œåƒæœåŠ¡
       run: |
         echo "${{ secrets.ALICLOUD_PASSWORD }}" | docker login ${{ secrets.ALICLOUD_REGISTRY }} -u ${{ secrets.ALICLOUD_USERNAME }} --password-stdin
         ALICLOUD_IMAGE_TAG="${{ secrets.ALICLOUD_REGISTRY }}/${{ secrets.ALICLOUD_NAMESPACE }}/$REPOSITORY_NAME:$IMAGE_TAG"
