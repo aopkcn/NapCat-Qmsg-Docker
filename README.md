@@ -1,9 +1,9 @@
 # NapCat-Qmsg-Docker
 
 
-[DockerHub](docker.io/aopkcn/napcat:qmsg)
-[GHCR](ghcr.io/aopkcn/napcat:qmsg)
-[阿里云](registry.cn-chengdu.aliyuncs.com/aopkcn/napcat:qmsg)
+ - [DockerHub](docker.io/aopkcn/napcat:qmsg)
+ - [GHCR](ghcr.io/aopkcn/napcat:qmsg)
+ - [阿里云](registry.cn-chengdu.aliyuncs.com/aopkcn/napcat:qmsg)
 
 ## Support Platform/Arch
 - [x] Linux/Amd64
