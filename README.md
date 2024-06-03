@@ -38,7 +38,6 @@ services:
             - ACCOUNT=<机器人qq>
             - AUTO_UPDATE=<设置1开启自动更新>
             - WEBUI_TOKEN=<qmsg密钥>
-            - WS_ENABLE=true
         ports:
             - 6099:6099
         container_name: napcat
