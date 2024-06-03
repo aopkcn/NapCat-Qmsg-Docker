@@ -14,68 +14,66 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: ¹¹½¨¾µÏñ
+    - name: æ„å»ºé•œåƒ
       run: |
         REPOSITORY_NAME="napcat"
         IMAGE_TAG="qmsg"
+        docker build -t $REPOSITORY_NAME:$IMAGE_TAG . 
 
-        # ¹¹½¨¾µÏñ
-        docker build -t $REPOSITORY_NAME:$IMAGE_TAG .
-
-    - name: ÍÆËÍµ½ÍÆËÍµ½GitHub Container RegistryÈİÆ÷¾µÏñ²Ö¿â
+    - name: æ¨é€åˆ°æ¨é€åˆ°GitHub Container Registryå®¹å™¨é•œåƒä»“åº“
       run: 
-        # µÇÂ¼µ½ GitHub Container Registry
+        # ç™»å½•åˆ° GitHub Container Registry
         echo "${{ secrets.GHCR_KEY }}" | docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} --password-stdin
         if [ $? -ne 0 ]; then
-          echo "µÇÂ¼µ½ GitHub Container Registry Ê§°Ü£¡"
+          echo "ç™»å½•åˆ° GitHub Container Registry å¤±è´¥ï¼"
           exit 1
         fi
 
-        # ÍÆËÍµ½ GitHub Container Registry
+        # æ¨é€åˆ° GitHub Container Registry
         GHCR_IMAGE_TAG="ghcr.io/${{ secrets.GHCR_USERNAME }}/$REPOSITORY_NAME:$IMAGE_TAG"
         docker tag $REPOSITORY_NAME:$IMAGE_TAG $GHCR_IMAGE_TAG
         docker push $GHCR_IMAGE_TAG
         if [ $? -eq 0 ]; then
-          echo "¾µÏñÍÆËÍµ½ GitHub Container Registry ³É¹¦£¡"
+          echo "é•œåƒæ¨é€åˆ° GitHub Container Registry æˆåŠŸï¼"
         else
-          echo "¾µÏñÍÆËÍµ½ GitHub Container Registry Ê§°Ü£¡"
+          echo "é•œåƒæ¨é€åˆ° GitHub Container Registry å¤±è´¥ï¼"
           exit 1
         fi
-    - name: ÍÆËÍµ½ÍÆËÍµ½Docker HubÈİÆ÷¾µÏñ²Ö¿â
+    - name: æ¨é€åˆ°æ¨é€åˆ°Docker Hubå®¹å™¨é•œåƒä»“åº“
       run: |
-        # µÇÂ¼µ½ Docker Hub
+        # ç™»å½•åˆ° Docker Hub
         echo "${{ secrets.DOCKER_PASSWD }}" | docker login docker.io -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
         if [ $? -ne 0 ]; then
-          echo "µÇÂ¼µ½ Docker Hub Ê§°Ü£¡"
+          echo "ç™»å½•åˆ° Docker Hub å¤±è´¥ï¼"
           exit 1
         fi
 
-        # ÍÆËÍµ½ Docker Hub
+        # æ¨é€åˆ° Docker Hub
         DOCKER_IMAGE_TAG="docker.io/${{ secrets.DOCKER_USERNAME }}/$REPOSITORY_NAME:$IMAGE_TAG"
         docker tag $REPOSITORY_NAME:$IMAGE_TAG $DOCKER_IMAGE_TAG
         docker push $DOCKER_IMAGE_TAG
         if [ $? -eq 0 ]; then
-          echo "¾µÏñÍÆËÍµ½ Docker Hub ³É¹¦£¡"
+          echo "é•œåƒæ¨é€åˆ° Docker Hub æˆåŠŸï¼"
         else
-          echo "¾µÏñÍÆËÍµ½ Docker Hub Ê§°Ü£¡"
+          echo "é•œåƒæ¨é€åˆ° Docker Hub å¤±è´¥ï¼"
           exit 1
         fi
-    - name: ÍÆËÍµ½ÍÆËÍµ½°¢ÀïÔÆÈİÆ÷¾µÏñ²Ö¿â
+    - name: æ¨é€åˆ°æ¨é€åˆ°é˜¿é‡Œäº‘å®¹å™¨é•œåƒä»“åº“
       run: |
-        # µÇÂ¼µ½°¢ÀïÔÆÈİÆ÷¾µÏñ·şÎñ
+        # ç™»å½•åˆ°é˜¿é‡Œäº‘å®¹å™¨é•œåƒæœåŠ¡
         echo "${{ secrets.ALICLOUD_PASSWORD }}" | docker login ${{ secrets.ALICLOUD_REGISTRY }} -u ${{ secrets.ALICLOUD_USERNAME }} --password-stdin
         if [ $? -ne 0 ]; then
-          echo "µÇÂ¼µ½°¢ÀïÔÆÈİÆ÷¾µÏñ·şÎñÊ§°Ü£¡"
+          echo "ç™»å½•åˆ°é˜¿é‡Œäº‘å®¹å™¨é•œåƒæœåŠ¡å¤±è´¥ï¼"
           exit 1
         fi
 
-        # ÍÆËÍµ½°¢ÀïÔÆÈİÆ÷¾µÏñ·şÎñ
+        # æ¨é€åˆ°é˜¿é‡Œäº‘å®¹å™¨é•œåƒæœåŠ¡
         ALICLOUD_IMAGE_TAG="${{ secrets.ALICLOUD_REGISTRY }}/${{ secrets.ALICLOUD_NAMESPACE }}/$REPOSITORY_NAME:$IMAGE_TAG"
         docker tag $REPOSITORY_NAME:$IMAGE_TAG $ALICLOUD_IMAGE_TAG
         docker push $ALICLOUD_IMAGE_TAG
         if [ $? -eq 0 ]; then
-          echo "¾µÏñÍÆËÍµ½°¢ÀïÔÆÈİÆ÷¾µÏñ·şÎñ³É¹¦£¡"
+          echo "é•œåƒæ¨é€åˆ°é˜¿é‡Œäº‘å®¹å™¨é•œåƒæœåŠ¡æˆåŠŸï¼"
         else
-          echo "¾µÏñÍÆËÍµ½°¢ÀïÔÆÈİÆ÷¾µÏñ·şÎñÊ§°Ü£¡"
+          echo "é•œåƒæ¨é€åˆ°é˜¿é‡Œäº‘å®¹å™¨é•œåƒæœåŠ¡å¤±è´¥ï¼"
           exit 1
         fi
