@@ -18,8 +18,7 @@ jobs:
       run: |
         REPOSITORY_NAME="napcat"
         IMAGE_TAG="qmsg"
-        docker build -t $REPOSITORY_NAME:$IMAGE_TAG . 
-
+        docker build -t $REPOSITORY_NAME:$IMAGE_TAG .
     - name: 推送到推送到GitHub Container Registry容器镜像仓库
       run: 
         # 登录到 GitHub Container Registry
