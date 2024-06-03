@@ -1,9 +1,18 @@
+<div align="center">
+  <img src="https://socialify.git.ci/NapNeko/NapCatQQ/image?description=1&language=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2FNapNeko%2FNapCatQQ%2Fmain%2Flogo.png&name=1&stargazers=1&theme=Auto" alt="NapCatQQ" width="640" height="320" />
+  <img src="https://qmsg.zendee.cn/img/icon.png" alt="qmsg" width="640" height="320" />
+</div>
+
 # NapCat-Qmsg-Docker
 
+ - [DockerHub](https://hub.docker.com/aopkcn/napcat:qmsg)
+    * `docker.io/aopkcn/napcat:qmsg`
 
- - [DockerHub](docker.io/aopkcn/napcat:qmsg)
- - [GHCR](ghcr.io/aopkcn/napcat:qmsg)
- - [阿里云](registry.cn-chengdu.aliyuncs.com/aopkcn/napcat:qmsg)
+ - [GHCR](https://ghcr.io/aopkcn/napcat:qmsg)
+   * `ghcr.io/aopkcn/napcat:qmsg`
+
+ - [阿里云]()
+   * `registry.cn-chengdu.aliyuncs.com/aopkcn/napcat:qmsg`
 
 ## Support Platform/Arch
 - [x] Linux/Amd64
@@ -12,7 +21,7 @@
 
 容器通过环境变量来配置，环境变量名称可以查看 [entrypoint](./entrypoint.sh)👈
 
-具体参数可参考[官方文档](https://napneko.github.io/zh-CN/guide/getting-started)
+具体参数可参考[NapCatQQ官方文档](https://napneko.github.io/zh-CN/guide/getting-started)[Qmsg酱官方文档](https://qmsg.zendee.cn/docs/)
 
 # 启动容器
 ## QMSG
