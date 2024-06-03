@@ -34,7 +34,7 @@ RUN apt-get update \
 
 WORKDIR /usr/src/app
 
-# 复制必要的文件
+# 复制入口文件
 COPY entrypoint.sh .
 
 # 安装Linux QQ
