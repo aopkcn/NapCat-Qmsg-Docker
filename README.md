@@ -47,6 +47,8 @@ services:
         image: aopkcn/napcat:qmsg
 ```
 ## 正向 WS
+<details>
+<summary>点我查看命令👈</summary>
 
 ```shell
 docker run -d \
@@ -75,6 +77,7 @@ services:
         restart: always
         image: aopkcn/napcat:qmsg
 ```
+</details>
 
 ## 反向 WS
 <details>
