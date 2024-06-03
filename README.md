@@ -160,3 +160,7 @@ NapCat 配置文件路径: /usr/src/app/napcat/config
 ```shell
 docker logs napcat
 ```
+
+```WEBUI
+<IP>:<端口>/webui
+```
