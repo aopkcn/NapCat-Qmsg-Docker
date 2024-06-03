@@ -12,13 +12,26 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Build the Docker image
+    - name: Build the Docker image for amd64
       run: |
         REPOSITORY_NAME="napcat"
         IMAGE_TAG="qmsg"
 
-        # 构建镜像
-        docker build -t $REPOSITORY_NAME:$IMAGE_TAG .
+        # 构建 amd64 架构的镜像
+        docker build -t $REPOSITORY_NAME:$IMAGE_TAG-amd64 .
+
+    - name: Build the Docker image for arm64
+      run: |
+        REPOSITORY_NAME="napcat"
+        IMAGE_TAG="qmsg"
+
+        # 构建 arm64 架构的镜像
+        docker build -t $REPOSITORY_NAME:$IMAGE_TAG-arm64 .
+        
+    - name: Login and push images to GitHub Container Registry, Docker Hub, and Alibaba Cloud
+      run: |
+        REPOSITORY_NAME="napcat"
+        IMAGE_TAG="qmsg"
 
         # 登录到 GitHub Container Registry
         echo $GHCR_KEY | docker login ghcr.io -u $GHCR_USERNAME --password-stdin
@@ -27,14 +40,25 @@ jobs:
           exit 1
         fi
 
-        # 推送到 GitHub Container Registry
-        GHCR_IMAGE_TAG="ghcr.io/$GHCR_USERNAME/$REPOSITORY_NAME:$IMAGE_TAG"
-        docker tag $REPOSITORY_NAME:$IMAGE_TAG $GHCR_IMAGE_TAG
-        docker push $GHCR_IMAGE_TAG
+        # 推送 amd64 架构的镜像到 GitHub Container Registry
+        GHCR_IMAGE_TAG_AMD64="ghcr.io/$GHCR_USERNAME/$REPOSITORY_NAME:$IMAGE_TAG-amd64"
+        docker tag $REPOSITORY_NAME:$IMAGE_TAG-amd64 $GHCR_IMAGE_TAG_AMD64
+        docker push $GHCR_IMAGE_TAG_AMD64
         if [ $? -eq 0 ]; then
-          echo "镜像推送到 GitHub Container Registry 成功！"
+          echo "amd64 架构的镜像推送到 GitHub Container Registry 成功！"
         else
-          echo "镜像推送到 GitHub Container Registry 失败！"
+          echo "amd64 架构的镜像推送到 GitHub Container Registry 失败！"
+          exit 1
+        fi
+
+        # 推送 arm64 架构的镜像到 GitHub Container Registry
+        GHCR_IMAGE_TAG_ARM64="ghcr.io/$GHCR_USERNAME/$REPOSITORY_NAME:$IMAGE_TAG-arm64"
+        docker tag $REPOSITORY_NAME:$IMAGE_TAG-arm64 $GHCR_IMAGE_TAG_ARM64
+        docker push $GHCR_IMAGE_TAG_ARM64
+        if [ $? -eq 0 ]; then
+          echo "arm64 架构的镜像推送到 GitHub Container Registry 成功！"
+        else
+          echo "arm64 架构的镜像推送到 GitHub Container Registry 失败！"
           exit 1
         fi
 
@@ -45,14 +69,25 @@ jobs:
           exit 1
         fi
 
-        # 推送到 Docker Hub
-        DOCKER_IMAGE_TAG="docker.io/$DOCKER_USERNAME/$REPOSITORY_NAME:$IMAGE_TAG"
-        docker tag $REPOSITORY_NAME:$IMAGE_TAG $DOCKER_IMAGE_TAG
-        docker push $DOCKER_IMAGE_TAG
+        # 推送 amd64 架构的镜像到 Docker Hub
+        DOCKER_IMAGE_TAG_AMD64="docker.io/$DOCKER_USERNAME/$REPOSITORY_NAME:$IMAGE_TAG-amd64"
+        docker tag $REPOSITORY_NAME:$IMAGE_TAG-amd64 $DOCKER_IMAGE_TAG_AMD64
+        docker push $DOCKER_IMAGE_TAG_AMD64
         if [ $? -eq 0 ]; then
-          echo "镜像推送到 Docker Hub 成功！"
+          echo "amd64 架构的镜像推送到 Docker Hub 成功！"
         else
-          echo "镜像推送到 Docker Hub 失败！"
+          echo "amd64 架构的镜像推送到 Docker Hub 失败！"
+          exit 1
+        fi
+
+        # 推送 arm64 架构的镜像到 Docker Hub
+        DOCKER_IMAGE_TAG_ARM64="docker.io/$DOCKER_USERNAME/$REPOSITORY_NAME:$IMAGE_TAG-arm64"
+        docker tag $REPOSITORY_NAME:$IMAGE_TAG-arm64 $DOCKER_IMAGE_TAG_ARM64
+        docker push $DOCKER_IMAGE_TAG_ARM64
+        if [ $? -eq 0 ]; then
+          echo "arm64 架构的镜像推送到 Docker Hub 成功！"
+        else
+          echo "arm64 架构的镜像推送到 Docker Hub 失败！"
           exit 1
         fi
 
@@ -63,13 +98,24 @@ jobs:
           exit 1
         fi
 
-        # 推送到阿里云容器镜像服务
-        ALICLOUD_IMAGE_TAG="$ALICLOUD_REGISTRY/$ALICLOUD_NAMESPACE/$REPOSITORY_NAME:$IMAGE_TAG"
-        docker tag $REPOSITORY_NAME:$IMAGE_TAG $ALICLOUD_IMAGE_TAG
-        docker push $ALICLOUD_IMAGE_TAG
+        # 推送 amd64 架构的镜像到阿里云容器镜像服务
+        ALICLOUD_IMAGE_TAG_AMD64="$ALICLOUD_REGISTRY/$ALICLOUD_NAMESPACE/$REPOSITORY_NAME:$IMAGE_TAG-amd64"
+        docker tag $REPOSITORY_NAME:$IMAGE_TAG-amd64 $ALICLOUD_IMAGE_TAG_AMD64
+        docker push $ALICLOUD_IMAGE_TAG_AMD64
         if [ $? -eq 0 ]; then
-          echo "镜像推送到阿里云容器镜像服务成功！"
+          echo "amd64 架构的镜像推送到阿里云容器镜像服务成功！"
         else
-          echo "镜像推送到阿里云容器镜像服务失败！"
+          echo "amd64 架构的镜像推送到阿里云容器镜像服务失败！"
+          exit 1
+        fi
+
+        # 推送 arm64 架构的镜像到阿里云容器镜像服务
+        ALICLOUD_IMAGE_TAG_ARM64="$ALICLOUD_REGISTRY/$ALICLOUD_NAMESPACE/$REPOSITORY_NAME:$IMAGE_TAG-arm64"
+        docker tag $REPOSITORY_NAME:$IMAGE_TAG-arm64 $ALICLOUD_IMAGE_TAG_ARM64
+        docker push $ALICLOUD_IMAGE_TAG_ARM64
+        if [ $? -eq 0 ]; then
+          echo "arm64 架构的镜像推送到阿里云容器镜像服务成功！"
+        else
+          echo "arm64 架构的镜像推送到阿里云容器镜像服务失败！"
           exit 1
         fi
