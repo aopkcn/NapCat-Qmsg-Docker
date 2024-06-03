@@ -1,30 +1,71 @@
-name: Test Secrets
+name: Docker Image CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
 
 jobs:
-  test_secrets:
+
+  build:
+
     runs-on: ubuntu-latest
 
     steps:
-    - name: Check secrets
-      env:
-        GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
-        GHCR_KEY: ${{ secrets.GHCR_KEY }}
-        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-        DOCKER_PASSWD: ${{ secrets.DOCKER_PASSWD }}
-        ALICLOUD_USERNAME: ${{ secrets.ALICLOUD_USERNAME }}
-        ALICLOUD_PASSWORD: ${{ secrets.ALICLOUD_PASSWORD }}
-        ALICLOUD_REGISTRY: ${{ secrets.ALICLOUD_REGISTRY }}
-        ALICLOUD_NAMESPACE: ${{ secrets.ALICLOUD_NAMESPACE }}
+    - uses: actions/checkout@v4
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Set Environment Variables
       run: |
-        echo "GHCR_USERNAME: $GHCR_USERNAME"
-        echo "GHCR_KEY: $GHCR_KEY"
-        echo "DOCKER_USERNAME: $DOCKER_USERNAME"
-        echo "DOCKER_PASSWD: $DOCKER_PASSWD"
-        echo "ALICLOUD_USERNAME: $ALICLOUD_USERNAME"
-        echo "ALICLOUD_PASSWORD: $ALICLOUD_PASSWORD"
-        echo "ALICLOUD_REGISTRY: $ALICLOUD_REGISTRY"
-        echo "ALICLOUD_NAMESPACE: $ALICLOUD_NAMESPACE"
+        echo "${{ secrets.ENV }}" > envfile
+      env:
+        ENV: ${{ secrets.ENV }}
+    
+    - name: Source Environment Variables
+      run: |
+        source envfile
+        echo $GHCR_KEY | docker login ghcr.io -u $GHCR_USERNAME --password-stdin
+        echo $DOCKER_PASSWD | docker login docker.io -u $DOCKER_USERNAME --password-stdin
+        echo $ALICLOUD_PASSWORD | docker login $ALICLOUD_REGISTRY -u $ALICLOUD_USERNAME --password-stdin
+
+    - name: Build and push Docker images
+      run: |
+        REPOSITORY_NAME="napcat"
+        IMAGE_TAG="qmsg"
+
+        # 构建并推送 amd64 架构的镜像
+        docker buildx build --platform linux/amd64 -t $REPOSITORY_NAME:$IMAGE_TAG-amd64 --push .
+        GHCR_IMAGE_TAG_AMD64="ghcr.io/$GHCR_USERNAME/$REPOSITORY_NAME:$IMAGE_TAG-amd64"
+        DOCKER_IMAGE_TAG_AMD64="docker.io/$DOCKER_USERNAME/$REPOSITORY_NAME:$IMAGE_TAG-amd64"
+        ALICLOUD_IMAGE_TAG_AMD64="$ALICLOUD_REGISTRY/$ALICLOUD_NAMESPACE/$REPOSITORY_NAME:$IMAGE_TAG-amd64"
+        docker tag $REPOSITORY_NAME:$IMAGE_TAG-amd64 $GHCR_IMAGE_TAG_AMD64
+        docker tag $REPOSITORY_NAME:$IMAGE_TAG-amd64 $DOCKER_IMAGE_TAG_AMD64
+        docker tag $REPOSITORY_NAME:$IMAGE_TAG-amd64 $ALICLOUD_IMAGE_TAG_AMD64
+        docker push $GHCR_IMAGE_TAG_AMD64
+        docker push $DOCKER_IMAGE_TAG_AMD64
+        docker push $ALICLOUD_IMAGE_TAG_AMD64
+
+        # 构建并推送 arm64 架构的镜像
+        docker buildx build --platform linux/arm64 -t $REPOSITORY_NAME:$IMAGE_TAG-arm64 --push .
+        GHCR_IMAGE_TAG_ARM64="ghcr.io/$GHCR_USERNAME/$REPOSITORY_NAME:$IMAGE_TAG-arm64"
+        DOCKER_IMAGE_TAG_ARM64="docker.io/$DOCKER_USERNAME/$REPOSITORY_NAME:$IMAGE_TAG-arm64"
+        ALICLOUD_IMAGE_TAG_ARM64="$ALICLOUD_REGISTRY/$ALICLOUD_NAMESPACE/$REPOSITORY_NAME:$IMAGE_TAG-arm64"
+        docker tag $REPOSITORY_NAME:$IMAGE_TAG-arm64 $GHCR_IMAGE_TAG_ARM64
+        docker tag $REPOSITORY_NAME:$IMAGE_TAG-arm64 $DOCKER_IMAGE_TAG_ARM64
+        docker tag $REPOSITORY_NAME:$IMAGE_TAG-arm64 $ALICLOUD_IMAGE_TAG_ARM64
+        docker push $GHCR_IMAGE_TAG_ARM64
+        docker push $DOCKER_IMAGE_TAG_ARM64
+        docker push $ALICLOUD_IMAGE_TAG_ARM64
+
+    - name: Logout from GitHub Container Registry
+      run: docker logout ghcr.io
+
+    - name: Logout from Docker Hub
+      run: docker logout docker.io
+
+    - name: Logout from Alibaba Cloud Registry
+      run: docker logout $ALICLOUD_REGISTRY
