@@ -1,17 +1,5 @@
 #!/bin/bash
 
-# 设置默认时区为 UTC+8
-TZ=${TZ:-UTC+8}
-export TZ
-
-# 获取 Docker 内部 IP 地址
-INTERNAL_IP=$(ip route get 1 | awk '{print $(NF-2);exit}')
-export INTERNAL_IP
-
-# 切换到工作目录
-cd /home/container || exit 1
-
-# 函数：检查引号
 check_quotes() {
     local input="$1"
     if [[ "${input:0:1}" != '"' ]]; then
@@ -21,54 +9,90 @@ check_quotes() {
     else
         input="[$input]"
     fi
-    echo "$input"
+    echo $input
 }
 
-# 自动更新
-if [[ "${AUTO_UPDATE}" == "1" ]]; then
+# 安装 napcat
+if [ ! -f "napcat/napcat.mjs" ]; then
     # 获取最新版本号
-    LATEST_VERSION=$(curl -sSL https://api.github.com/repos/NapNeko/NapCatQQ/releases/latest | grep '"tag_name":' | sed -E 's/.*"tag_name":\s*"([^"]+)".*/\1/')
+    LATEST_VERSION=$(curl -sSL https://api.github.com/repos/1244453393/QmsgNtClient-NapCatQQ/releases/latest | grep '"tag_name":' | sed -E 's/.*"tag_name":\s*"([^"]+)".*/\1/')
+    # 获取架构信息
+    ARCH=$(arch | sed 's/aarch64/arm64/' | sed 's/x86_64/amd64/')
+    # 下载文件，设置超时为1分钟
+    DOWNLOAD_URL="https://mirror.ghproxy.com/https://github.com/1244453393/QmsgNtClient-NapCatQQ/releases/download/${LATEST_VERSION}/QmsgNtClient-NapCatQQ_${ARCH}.zip"
+    curl -s --max-time 60 -L $DOWNLOAD_URL -o QmsgNtClient-NapCatQQ_${ARCH}.zip
+
+    # 检查文件是否存在并解压文件
+    if [ -f QmsgNtClient-NapCatQQ_${ARCH}.zip ]; then
+        # 检查zip文件是否有效
+        if unzip -t QmsgNtClient-NapCatQQ_${ARCH}.zip > /dev/null 2>&1; then
+            unzip -oq QmsgNtClient-NapCatQQ_${ARCH}.zip -d napcat
+            chmod +x napcat/napcat.sh
+            # 删除不需要的文件
+            rm -f QmsgNtClient-NapCatQQ_${ARCH}.zip
+            rm -f napcat/napcat.bat
+            rm -f napcat/napcat.ps1
+            rm -f napcat/napcat-log.ps1
+            rm -f napcat/napcat-utf8.bat
+            rm -f napcat/napcat-utf8.ps1
+            rm -f napcat/README.md
+        else
+            echo "下载的文件无效，无法解压。"
+            rm -f QmsgNtClient-NapCatQQ_${ARCH}.zip
+        fi
+    else
+        echo "QmsgNtClient-NapCatQQ_${ARCH}.zip 不存在"
+    fi
+fi
+
+# 如果设置为 1，则更新
+if [ "${AUTO_UPDATE}" == "1" ]; then
+    # 获取最新版本号
+    LATEST_VERSION=$(curl -sSL https://api.github.com/repos/1244453393/QmsgNtClient-NapCatQQ/releases/latest | grep '"tag_name":' | sed -E 's/.*"tag_name":\s*"([^"]+)".*/\1/')
 
     # 获取本地版本号
-    LOCAL_VERSION=$(grep '"version":' /home/container/package.json | sed -E 's/.*"version":\s*"([^"]+)".*/\1/')
-
+    LOCAL_VERSION=$(grep '"version":' napcat/package.json | sed -E 's/.*"version":\s*"([^"]+)".*/v\1/')
     echo "最新版本: $LATEST_VERSION"
     echo "本地版本: $LOCAL_VERSION"
 
     if [ "$LATEST_VERSION" != "$LOCAL_VERSION" ]; then
         echo "版本不匹配，开始更新..."
         # 获取架构信息
-        ARCH=$(dpkg --print-architecture | sed 's/amd64/x64/' | sed 's/arm64/arm64/')
-        DOWNLOAD_URL="https://mirror.ghproxy.com/https://github.com/NapNeko/NapCatQQ/releases/download/${LATEST_VERSION}/NapCat.linux.${ARCH}.zip"
+        ARCH=$(arch | sed 's/aarch64/arm64/' | sed 's/x86_64/amd64/')
+        
+        # 下载文件，设置超时为1分钟
+        DOWNLOAD_URL="https://mirror.ghproxy.com/https://github.com/1244453393/QmsgNtClient-NapCatQQ/releases/download/${LATEST_VERSION}/QmsgNtClient-NapCatQQ_${ARCH}.zip"
+        curl -s --max-time 60 -L $DOWNLOAD_URL -o QmsgNtClient-NapCatQQ_${ARCH}.zip
 
-        # 下载并解压文件
-        curl -s -X GET -L $DOWNLOAD_URL -o NapCat.linux.${ARCH}.zip
-        if [ -f NapCat.linux.${ARCH}.zip ]; then
-            unzip -o NapCat.linux.${ARCH}.zip -d /home/container
-            mv NapCat.linux.${ARCH}/* /home/container
-            rm -f NapCat.linux.${ARCH}.zip
-            rm -fR README.md
-            rm -fR NapCat.linux.${ARCH}
-            echo "更新完成。"
+        # 检查文件是否存在并解压文件
+        if [ -f QmsgNtClient-NapCatQQ_${ARCH}.zip ]; then
+            # 检查zip文件是否有效
+            if unzip -t QmsgNtClient-NapCatQQ_${ARCH}.zip > /dev/null 2>&1; then
+                unzip -oq QmsgNtClient-NapCatQQ_${ARCH}.zip -d napcat
+                chmod +x napcat/napcat.sh
+                # 删除不需要的文件
+                rm -f QmsgNtClient-NapCatQQ_${ARCH}.zip
+                rm -f napcat/napcat.bat
+                rm -f napcat/napcat.ps1
+                rm -f napcat/napcat-log.ps1
+                rm -f napcat/napcat-utf8.bat
+                rm -f napcat/napcat-utf8.ps1
+                rm -f napcat/README.md
+                echo "更新完成。"
+            else
+                echo "下载的文件无效，无法解压。"
+                rm -f QmsgNtClient-NapCatQQ_${ARCH}.zip
+            fi
         else
-            echo "下载失败: NapCat.linux.${ARCH}.zip 不存在"
+            echo "QmsgNtClient-NapCatQQ_${ARCH}.zip 不存在"
         fi
     else
         echo "版本匹配，不需要更新。"
     fi
-
 else
     echo "自动更新未开启。直接启动服务器"
 fi
 
-# 设置 WebUI 配置
-cat <<EOF > config/webui.json
-{
-    "port": $SERVER_PORT,
-    "token": "$WEBUI_TOKEN",
-    "loginRate": 3
-}
-EOF
 # 设置配置文件路径
 if [ -z "$ACCOUNT" ]; then
     CONFIG_PATH=config/onebot11.json
@@ -76,43 +100,49 @@ else
     CONFIG_PATH=config/onebot11_$ACCOUNT.json
 fi
 
-# 计算端口
-((HTTP_PORT = SERVER_PORT + 1))
-((WS_PORT = SERVER_PORT + 2))
+# 容器首次启动时执行
+if [ ! -f "$CONFIG_PATH" ]; then
+    : ${WEBUI_PORT:='6099'}
+    : ${WEBUI_TOKEN:=$(openssl rand -base64 6 | tr -dc 'a-zA-Z0-9' | head -c 8)}
+    : ${HTTP_PORT:=3000}
+    : ${HTTP_URLS:='[]'}
+    : ${WS_PORT:=3001}
+    : ${HTTP_ENABLE:='false'}
+    : ${HTTP_POST_ENABLE:='false'}
+    : ${WS_ENABLE:='false'}
+    : ${WSR_ENABLE:='false'}
+    : ${WS_URLS:='[]'}
+    : ${HEART_INTERVAL:=60000}
+    : ${TOKEN:=''}
+    : ${F2U_ENABLE:='false'}
+    : ${DEBUG_ENABLE:='false'}
+    : ${LOG_ENABLE:='false'}
+    : ${RSM_ENABLE:='false'}
+    : ${MESSAGE_POST_FORMAT:='array'}
+    : ${HTTP_HOST:=''}
+    : ${WS_HOST:=''}
+    : ${HTTP_HEART_ENABLE:='false'}
+    : ${MUSIC_SIGN_URL:=''}
+    : ${HTTP_SECRET:=''}
+    : ${QMSG_KEY:=''}
+    : ${QMSG_WEBURL:='https://qmsg.zendee.cn/'}
+    HTTP_URLS=$(check_quotes "$HTTP_URLS")
+    WS_URLS=$(check_quotes "$WS_URLS")
 
-# 输出配置路径
-echo "正在设置$CONFIG_PATH"
-
-# 设置默认值
-: ${WEBUI_TOKEN:=''}
-: ${HTTP_PORT:=3000}
-: ${HTTP_URLS:='[]'}
-: ${WS_PORT:=3001}
-: ${HTTP_ENABLE:='false'}
-: ${HTTP_POST_ENABLE:='false'}
-: ${WS_ENABLE:='false'}
-: ${WSR_ENABLE:='false'}
-: ${WS_URLS:='[]'}
-: ${HEART_INTERVAL:=60000}
-: ${TOKEN:=''}
-: ${F2U_ENABLE:='false'}
-: ${DEBUG_ENABLE:='false'}
-: ${LOG_ENABLE:='false'}
-: ${RSM_ENABLE:='false'}
-: ${MESSAGE_POST_FORMAT:='array'}
-: ${HTTP_HOST:=''}
-: ${WS_HOST:=''}
-: ${HTTP_HEART_ENABLE:='false'}
-: ${MUSIC_SIGN_URL:=''}
-: ${HTTP_SECRET:=''}
-
-# 检查引号
-HTTP_URLS=$(check_quotes $HTTP_URLS)
-WS_URLS=$(check_quotes $WS_URLS)
-
-# 写入配置文件
-cat <<EOF > $CONFIG_PATH
+    cat <<EOF > napcat/config/webui.json
 {
+    "port": $WEBUI_PORT,
+    "token": "$WEBUI_TOKEN",
+    "loginRate": 3
+}
+EOF
+
+    cat <<EOF > $CONFIG_PATH
+{
+    "qmsg": {
+      "qmsgKey": "$QMSG_KEY",
+      "qmsgWebUrl": "$QMSG_WEBURL"
+    },
     "http": {
       "enable": ${HTTP_ENABLE},
       "host": "$HTTP_HOST",
@@ -141,20 +171,8 @@ cat <<EOF > $CONFIG_PATH
 }
 EOF
 
-# 安装 napcat
-if [ ! -f "napcat.mjs" ]; then
-    echo "napcat.mjs文件不存在亲重新安装！"
 fi
 
-# 确保脚本具有执行权限
-chmod +x ./napcat.sh
-
-# 设置 FFMPEG 路径
 export FFMPEG_PATH=/usr/bin/ffmpeg
-
-# 替换启动变量
-MODIFIED_STARTUP=$(echo -e "${STARTUP}" | sed -e 's/{{/${/g' -e 's/}}/}/g')
-echo -e ":/home/container$ ${MODIFIED_STARTUP}"
-
-# 运行服务器
-eval "${MODIFIED_STARTUP}"
+cd ./napcat
+./napcat.sh $( [[ -n "{{ACCOUNT}}" ]] && echo "-q {{ACCOUNT}}" )
