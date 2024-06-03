@@ -21,22 +21,39 @@ jobs:
         docker build -t $REPOSITORY_NAME:$IMAGE_TAG .
 
     - name: 推送到 GitHub 容器注册表
+      env:
+        GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+        GHCR_KEY: ${{ secrets.GHCR_KEY }}
+        REPOSITORY_NAME: "napcat"
+        IMAGE_TAG: "qmsg"
       run: |
-        echo "${{ secrets.GHCR_KEY }}" | docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} --password-stdin
-        GHCR_IMAGE_TAG="ghcr.io/${{ secrets.GHCR_USERNAME }}/$REPOSITORY_NAME:$IMAGE_TAG"
-        docker tag $REPOSITORY_NAME:$IMAGE_TAG $GHCR_IMAGE_TAG
-        docker push $GHCR_IMAGE_TAG
+        echo "${GHCR_KEY}" | docker login ghcr.io -u "${GHCR_USERNAME}" --password-stdin
+        GHCR_IMAGE_TAG="ghcr.io/${GHCR_USERNAME}/${REPOSITORY_NAME}:${IMAGE_TAG}"
+        docker tag "${REPOSITORY_NAME}:${IMAGE_TAG}" "${GHCR_IMAGE_TAG}"
+        docker push "${GHCR_IMAGE_TAG}"
 
     - name: 推送到 Docker Hub
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWD: ${{ secrets.DOCKER_PASSWD }}
+        REPOSITORY_NAME: "napcat"
+        IMAGE_TAG: "qmsg"
       run: |
-        echo "${{ secrets.DOCKER_PASSWD }}" | docker login docker.io -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-        DOCKER_IMAGE_TAG="docker.io/${{ secrets.DOCKER_USERNAME }}/$REPOSITORY_NAME:$IMAGE_TAG"
-        docker tag $REPOSITORY_NAME:$IMAGE_TAG $DOCKER_IMAGE_TAG
-        docker push $DOCKER_IMAGE_TAG
+        echo "${DOCKER_PASSWD}" | docker login docker.io -u "${DOCKER_USERNAME}" --password-stdin
+        DOCKER_IMAGE_TAG="docker.io/${DOCKER_USERNAME}/${REPOSITORY_NAME}:${IMAGE_TAG}"
+        docker tag "${REPOSITORY_NAME}:${IMAGE_TAG}" "${DOCKER_IMAGE_TAG}"
+        docker push "${DOCKER_IMAGE_TAG}"
 
     - name: 推送到阿里云容器镜像服务
+      env:
+        ALICLOUD_USERNAME: ${{ secrets.ALICLOUD_USERNAME }}
+        ALICLOUD_PASSWORD: ${{ secrets.ALICLOUD_PASSWORD }}
+        ALICLOUD_REGISTRY: ${{ secrets.ALICLOUD_REGISTRY }}
+        ALICLOUD_NAMESPACE: ${{ secrets.ALICLOUD_NAMESPACE }}
+        REPOSITORY_NAME: "napcat"
+        IMAGE_TAG: "qmsg"
       run: |
-        echo "${{ secrets.ALICLOUD_PASSWORD }}" | docker login ${{ secrets.ALICLOUD_REGISTRY }} -u ${{ secrets.ALICLOUD_USERNAME }} --password-stdin
-        ALICLOUD_IMAGE_TAG="${{ secrets.ALICLOUD_REGISTRY }}/${{ secrets.ALICLOUD_NAMESPACE }}/$REPOSITORY_NAME:$IMAGE_TAG"
-        docker tag $REPOSITORY_NAME:$IMAGE_TAG $ALICLOUD_IMAGE_TAG
-        docker push $ALICLOUD_IMAGE_TAG
+        echo "${ALICLOUD_PASSWORD}" | docker login "${ALICLOUD_REGISTRY}" -u "${ALICLOUD_USERNAME}" --password-stdin
+        ALICLOUD_IMAGE_TAG="${ALICLOUD_REGISTRY}/${ALICLOUD_NAMESPACE}/${REPOSITORY_NAME}:${IMAGE_TAG}"
+        docker tag "${REPOSITORY_NAME}:${IMAGE_TAG}" "${ALICLOUD_IMAGE_TAG}"
+        docker push "${ALICLOUD_IMAGE_TAG}"
