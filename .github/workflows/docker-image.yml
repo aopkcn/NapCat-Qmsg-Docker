@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Docker 镜像 CI
 
 on:
   push:
@@ -11,71 +11,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: 检出代码
       uses: actions/checkout@v4
 
     - name: 构建镜像
       run: |
         REPOSITORY_NAME="napcat"
         IMAGE_TAG="qmsg"
-
-        # 构建镜像
         docker build -t $REPOSITORY_NAME:$IMAGE_TAG .
 
-    - name: 推送到推送到GitHub Container Registry容器镜像仓库
-      run: 
-        # 登录到 GitHub Container Registry
+    - name: 推送到 GitHub 容器注册表
+      run: |
         echo "${{ secrets.GHCR_KEY }}" | docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} --password-stdin
-        if [ $? -ne 0 ]; then
-          echo "登录到 GitHub Container Registry 失败！"
-          exit 1
-        fi
-
-        # 推送到 GitHub Container Registry
         GHCR_IMAGE_TAG="ghcr.io/${{ secrets.GHCR_USERNAME }}/$REPOSITORY_NAME:$IMAGE_TAG"
         docker tag $REPOSITORY_NAME:$IMAGE_TAG $GHCR_IMAGE_TAG
         docker push $GHCR_IMAGE_TAG
-        if [ $? -eq 0 ]; then
-          echo "镜像推送到 GitHub Container Registry 成功！"
-        else
-          echo "镜像推送到 GitHub Container Registry 失败！"
-          exit 1
-        fi
-    - name: 推送到推送到Docker Hub容器镜像仓库
-      run: |
-        # 登录到 Docker Hub
-        echo "${{ secrets.DOCKER_PASSWD }}" | docker login docker.io -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-        if [ $? -ne 0 ]; then
-          echo "登录到 Docker Hub 失败！"
-          exit 1
-        fi
 
-        # 推送到 Docker Hub
+    - name: 推送到 Docker Hub
+      run: |
+        echo "${{ secrets.DOCKER_PASSWD }}" | docker login docker.io -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
         DOCKER_IMAGE_TAG="docker.io/${{ secrets.DOCKER_USERNAME }}/$REPOSITORY_NAME:$IMAGE_TAG"
         docker tag $REPOSITORY_NAME:$IMAGE_TAG $DOCKER_IMAGE_TAG
         docker push $DOCKER_IMAGE_TAG
-        if [ $? -eq 0 ]; then
-          echo "镜像推送到 Docker Hub 成功！"
-        else
-          echo "镜像推送到 Docker Hub 失败！"
-          exit 1
-        fi
-    - name: 推送到推送到阿里云容器镜像仓库
-      run: |
-        # 登录到阿里云容器镜像服务
-        echo "${{ secrets.ALICLOUD_PASSWORD }}" | docker login ${{ secrets.ALICLOUD_REGISTRY }} -u ${{ secrets.ALICLOUD_USERNAME }} --password-stdin
-        if [ $? -ne 0 ]; then
-          echo "登录到阿里云容器镜像服务失败！"
-          exit 1
-        fi
 
-        # 推送到阿里云容器镜像服务
+    - name: 推送到阿里云容器镜像服务
+      run: |
+        echo "${{ secrets.ALICLOUD_PASSWORD }}" | docker login ${{ secrets.ALICLOUD_REGISTRY }} -u ${{ secrets.ALICLOUD_USERNAME }} --password-stdin
         ALICLOUD_IMAGE_TAG="${{ secrets.ALICLOUD_REGISTRY }}/${{ secrets.ALICLOUD_NAMESPACE }}/$REPOSITORY_NAME:$IMAGE_TAG"
         docker tag $REPOSITORY_NAME:$IMAGE_TAG $ALICLOUD_IMAGE_TAG
         docker push $ALICLOUD_IMAGE_TAG
-        if [ $? -eq 0 ]; then
-          echo "镜像推送到阿里云容器镜像服务成功！"
-        else
-          echo "镜像推送到阿里云容器镜像服务失败！"
-          exit 1
-        fi
