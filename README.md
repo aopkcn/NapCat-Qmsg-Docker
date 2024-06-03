@@ -1,7 +1,8 @@
 <div align="center">
-  <img src="https://socialify.git.ci/NapNeko/NapCatQQ/image?description=1&language=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2FNapNeko%2FNapCatQQ%2Fmain%2Flogo.png&name=1&stargazers=1&theme=Auto" alt="NapCatQQ" width="640" height="320" />
-  <img src="https://qmsg.zendee.cn/img/icon.png" alt="qmsg" width="640" height="320" />
+  <img src="https://socialify.git.ci/NapNeko/NapCatQQ/image?description=1&language=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2FNapNeko%2FNapCatQQ%2Fmain%2Flogo.png&name=1&stargazers=1&theme=Auto" alt="NapCatQQ" width="320" height="320" />
+  <img src="https://qmsg.zendee.cn/img/icon.png" alt="qmsg" width="320" height="320" />
 </div>
+
 
 # NapCat-Qmsg-Docker
 
