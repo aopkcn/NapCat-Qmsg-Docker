@@ -1,4 +1,4 @@
-name: Docker 镜像 CI
+name: 构建镜像推送
 
 on:
   push:
