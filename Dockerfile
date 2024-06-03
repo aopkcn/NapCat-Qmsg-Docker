@@ -3,10 +3,10 @@ FROM debian:12-slim
 LABEL author="蝼蚁梦" maintainer="aopkcn@qq.com"
 # 设置环境变量
 ENV DEBIAN_FRONTEND=noninteractive
-
+#换国内源
+#sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources
 # 安装必要的软件包
-RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources \
-    && apt-get update \
+RUN apt-get update \
     && apt-get install -y \
     libnss3 \
     libnotify4 \
@@ -40,6 +40,7 @@ COPY entrypoint.sh .
 # 安装Linux QQ
 RUN arch=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/amd64/) && \
     #curl -o linuxqq.deb https://dldir1.qq.com/qqfile/qq/QQNT/Linux/QQ_3.2.8_240520_${arch}_01.deb && \
+    #境外下载QQ特别慢使用自建的下载
     curl -o linuxqq.deb https://a.aopk.cn:444/QQ_3.2.8_240520_${arch}_01.deb && \
     dpkg -i --force-depends linuxqq.deb && rm linuxqq.deb && \
     chmod +x entrypoint.sh
