@@ -25,7 +25,7 @@ check_quotes() {
 }
 
 # 自动更新
-if [[ -z ${AUTO_UPDATE} || "${AUTO_UPDATE}" == "1" ]]; then
+if [[ "${AUTO_UPDATE}" == "1" ]]; then
     # 获取最新版本号
     LATEST_VERSION=$(curl -sSL https://api.github.com/repos/NapNeko/NapCatQQ/releases/latest | grep '"tag_name":' | sed -E 's/.*"tag_name":\s*"([^"]+)".*/\1/')
 
