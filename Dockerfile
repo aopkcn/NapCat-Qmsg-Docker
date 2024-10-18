@@ -39,7 +39,7 @@ COPY entrypoint.sh .
 
 # 安装Linux QQ
 RUN arch=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/amd64/) && \
-    curl -o linuxqq.deb https://dldir1.qq.com/qqfile/qq/QQNT/Linux/QQ_3.2.8_240520_${arch}_01.deb && \
+    curl -o linuxqq.deb https://dldir1.qq.com/qqfile/qq/QQNT/0256c948/linuxqq_3.2.12-28418_${arch}.deb && \
     dpkg -i --force-depends linuxqq.deb && rm linuxqq.deb && \
     chmod +x entrypoint.sh
 
